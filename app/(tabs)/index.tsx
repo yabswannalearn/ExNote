@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, Pressable, StyleSheet } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
@@ -21,6 +21,13 @@ export default function HomeScreen() {
         <ThemedText type="title">Welcome!</ThemedText>
         <HelloWave />
       </ThemedView>
+      <Link href="/split-maker" asChild>
+        <Pressable style={styles.primaryButton}>
+          <ThemedText type="defaultSemiBold" style={styles.primaryButtonText}>
+            Open Split Program Maker
+          </ThemedText>
+        </Pressable>
+      </Link>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
@@ -33,7 +40,7 @@ export default function HomeScreen() {
               web: 'F12',
             })}
           </ThemedText>{' '}
-          to open developer tools.
+          to open developer .
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
@@ -87,6 +94,16 @@ const styles = StyleSheet.create({
   stepContainer: {
     gap: 8,
     marginBottom: 8,
+  },
+  primaryButton: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: '#111827',
+  },
+  primaryButtonText: {
+    color: '#ffffff',
   },
   reactLogo: {
     height: 178,
