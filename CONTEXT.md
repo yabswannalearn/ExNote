@@ -16,6 +16,14 @@ _Avoid_: Workout, workout name, day
 An exercise entry that belongs to a **Training Day** and, through it, to the same **Split Program**. It defines the intended exercise name, sets, reps, rest time, and optional weight.
 _Avoid_: Exercise, workout item, set
 
+**Logged Session**:
+One actual performance of a **Training Day** on a date. Belongs to exactly one Training Day. Records what was actually done, as opposed to the planned **Exercise Prescriptions**.
+_Avoid_: workout, log, session record
+
+**Set Entry**:
+One actual set inside a **Logged Session** — actual reps, actual weight, and a done flag. Linked to the **Exercise Prescription** it was performed against.
+_Avoid_: set, rep, entry
+
 ## Example Dialogue
 
 Developer: "Does Push Pull Legs have three Training Days?"

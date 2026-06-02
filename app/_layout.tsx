@@ -40,6 +40,26 @@ async function migrateDb(db: SQLiteDatabase) {
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (training_day_id) REFERENCES training_days(id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS workout_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      training_day_id INTEGER NOT NULL,
+      started_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      finished_at TEXT,
+      FOREIGN KEY (training_day_id) REFERENCES training_days(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS set_entries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_id INTEGER NOT NULL,
+      exercise_prescription_id INTEGER NOT NULL,
+      set_number INTEGER NOT NULL,
+      reps TEXT NOT NULL,
+      weight REAL,
+      completed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (session_id) REFERENCES workout_sessions(id) ON DELETE CASCADE,
+      FOREIGN KEY (exercise_prescription_id) REFERENCES exercise_prescriptions(id) ON DELETE CASCADE
+    );
   `);
 
   // Add the optional weight column to databases created before it existed.
@@ -60,6 +80,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="split-maker" options={{ title: 'Split Program Maker' }} />
+          <Stack.Screen name="session" options={{ title: 'Workout' }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         </Stack>
         <StatusBar style="auto" />

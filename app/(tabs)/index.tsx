@@ -18,6 +18,10 @@ export default function HomeScreen() {
     router.push(splitId ? `/split-maker?splitId=${splitId}` : '/split-maker');
   }
 
+  function startSession(dayId: number) {
+    router.push(`/session?dayId=${dayId}`);
+  }
+
   return (
     <ScrollView
       style={styles.flex}
@@ -49,6 +53,7 @@ export default function HomeScreen() {
               key={program.id}
               program={program}
               onEdit={() => openEditor(program.id)}
+              onStartDay={startSession}
             />
           ))}
           <PrimaryButton label="New Program" icon="add" onPress={() => openEditor()} />

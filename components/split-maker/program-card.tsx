@@ -7,10 +7,11 @@ import { palette } from './palette';
 type Props = {
   program: ProgramOverview;
   onEdit: () => void;
+  onStartDay: (dayId: number) => void;
 };
 
 // Read-only summary of one Split Program: its days, each with its workouts.
-export function ProgramCard({ program, onEdit }: Props) {
+export function ProgramCard({ program, onEdit, onStartDay }: Props) {
   const dayCount = program.days.length;
   const exerciseCount = program.days.reduce((total, day) => total + day.exercises.length, 0);
 
@@ -38,7 +39,18 @@ export function ProgramCard({ program, onEdit }: Props) {
       ) : (
         program.days.map((day) => (
           <View key={day.id} style={styles.day}>
-            <Text style={styles.dayName}>{day.name}</Text>
+            <View style={styles.dayHeader}>
+              <Text style={styles.dayName}>{day.name}</Text>
+              {day.exercises.length > 0 ? (
+                <Pressable
+                  onPress={() => onStartDay(day.id)}
+                  hitSlop={8}
+                  style={({ pressed }) => [styles.startButton, pressed && styles.pressed]}>
+                  <Ionicons name="play" size={13} color="#ffffff" />
+                  <Text style={styles.startLabel}>Start</Text>
+                </Pressable>
+              ) : null}
+            </View>
             {day.exercises.length === 0 ? (
               <Text style={styles.empty}>No workouts.</Text>
             ) : (
@@ -110,10 +122,29 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: palette.border,
   },
+  dayHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   dayName: {
     fontSize: 15,
     fontWeight: '700',
     color: palette.primary,
+  },
+  startButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: palette.primary,
+  },
+  startLabel: {
+    color: '#ffffff',
+    fontWeight: '700',
+    fontSize: 12,
   },
   exerciseRow: {
     flexDirection: 'row',

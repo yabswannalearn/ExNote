@@ -3,6 +3,8 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 import type {
   ExerciseInput,
   ExercisePrescription,
+  SetEntry,
+  SetEntryInput,
   SplitProgram,
   TrainingDay,
 } from '@/types/workout';
@@ -107,4 +109,54 @@ export function updateExercisePrescription(
 
 export function deleteExercisePrescription(db: SQLiteDatabase, id: number) {
   return db.runAsync('DELETE FROM exercise_prescriptions WHERE id = ?', [id]);
+}
+
+// Session logging
+
+export async function startSession(db: SQLiteDatabase, trainingDayId: number) {
+  const result = await db.runAsync('INSERT INTO workout_sessions (training_day_id) VALUES (?)', [
+    trainingDayId,
+  ]);
+  return result.lastInsertRowId;
+}
+
+export function finishSession(db: SQLiteDatabase, sessionId: number) {
+  return db.runAsync(
+    'UPDATE workout_sessions SET finished_at = CURRENT_TIMESTAMP WHERE id = ?',
+    [sessionId]
+  );
+}
+
+export function addSetEntry(db: SQLiteDatabase, sessionId: number, input: SetEntryInput) {
+  return db.runAsync(
+    `INSERT INTO set_entries
+     (session_id, exercise_prescription_id, set_number, reps, weight)
+     VALUES (?, ?, ?, ?, ?)`,
+    [sessionId, input.exercise_prescription_id, input.set_number, input.reps, input.weight]
+  );
+}
+
+export function getSetEntries(db: SQLiteDatabase, sessionId: number) {
+  return db.getAllAsync<SetEntry>(
+    `SELECT id, session_id, exercise_prescription_id, set_number, reps, weight, completed_at
+     FROM set_entries
+     WHERE session_id = ?
+     ORDER BY completed_at ASC`,
+    [sessionId]
+  );
+}
+
+// Most recent set logged against this prescription in a finished session.
+// In-progress sessions have finished_at = NULL, so the current one is excluded.
+export function getLastEntryForExercise(db: SQLiteDatabase, exercisePrescriptionId: number) {
+  return db.getFirstAsync<SetEntry>(
+    `SELECT se.id, se.session_id, se.exercise_prescription_id, se.set_number,
+            se.reps, se.weight, se.completed_at
+     FROM set_entries se
+     JOIN workout_sessions ws ON ws.id = se.session_id
+     WHERE se.exercise_prescription_id = ? AND ws.finished_at IS NOT NULL
+     ORDER BY se.completed_at DESC
+     LIMIT 1`,
+    [exercisePrescriptionId]
+  );
 }
