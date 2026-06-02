@@ -12,14 +12,14 @@ import type {
 // Business logic / state orchestration for the Split Maker screen.
 // Holds the selection hierarchy (split -> day -> exercises) and keeps each
 // level loaded in sync with the one above it. UI stays free of DB concerns.
-export function useSplitMaker() {
+export function useSplitMaker(initialSplitId?: number) {
   const db = useSQLiteContext();
 
   const [splitPrograms, setSplitPrograms] = useState<SplitProgram[]>([]);
   const [trainingDays, setTrainingDays] = useState<TrainingDay[]>([]);
   const [exercises, setExercises] = useState<ExercisePrescription[]>([]);
 
-  const [selectedSplitId, setSelectedSplitId] = useState<number | null>(null);
+  const [selectedSplitId, setSelectedSplitId] = useState<number | null>(initialSplitId ?? null);
   const [selectedDayId, setSelectedDayId] = useState<number | null>(null);
 
   const selectedSplit = splitPrograms.find((program) => program.id === selectedSplitId) ?? null;

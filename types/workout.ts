@@ -16,6 +16,15 @@ export type ExercisePrescription = {
   sets: number;
   reps: string;
   rest_seconds: number;
+  weight: number | null;
+};
+
+export type TrainingDayWithExercises = TrainingDay & {
+  exercises: ExercisePrescription[];
+};
+
+export type ProgramOverview = SplitProgram & {
+  days: TrainingDayWithExercises[];
 };
 
 export type ExerciseInput = {
@@ -23,4 +32,5 @@ export type ExerciseInput = {
   sets: number;
   reps: string;
   rest_seconds: number;
+  weight: number | null;
 };

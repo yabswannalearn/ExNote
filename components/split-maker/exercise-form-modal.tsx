@@ -14,13 +14,20 @@ type Props = {
   onClose: () => void;
 };
 
-const DEFAULTS: ExerciseInput = { exercise_name: '', sets: 3, reps: '8-10', rest_seconds: 120 };
+const DEFAULTS: ExerciseInput = {
+  exercise_name: '',
+  sets: 3,
+  reps: '8-10',
+  rest_seconds: 120,
+  weight: null,
+};
 
 export function ExerciseFormModal({ visible, initial, onSubmit, onClose }: Props) {
   const [name, setName] = useState('');
   const [sets, setSets] = useState('');
   const [reps, setReps] = useState('');
   const [rest, setRest] = useState('');
+  const [weight, setWeight] = useState('');
 
   useEffect(() => {
     if (!visible) return;
@@ -29,13 +36,16 @@ export function ExerciseFormModal({ visible, initial, onSubmit, onClose }: Props
     setSets(String(seed.sets));
     setReps(seed.reps);
     setRest(String(seed.rest_seconds));
+    setWeight(seed.weight === null ? '' : String(seed.weight));
   }, [visible, initial]);
 
   function save() {
     const trimmedName = name.trim();
     const trimmedReps = reps.trim();
+    const trimmedWeight = weight.trim();
     const parsedSets = Number.parseInt(sets, 10);
     const parsedRest = Number.parseInt(rest, 10);
+    const parsedWeight = trimmedWeight === '' ? null : Number.parseFloat(trimmedWeight);
 
     if (!trimmedName || !trimmedReps) {
       Alert.alert('Missing details', 'Enter an exercise name and rep target.');
@@ -45,12 +55,17 @@ export function ExerciseFormModal({ visible, initial, onSubmit, onClose }: Props
       Alert.alert('Check your numbers', 'Sets and rest time should be numbers.');
       return;
     }
+    if (parsedWeight !== null && Number.isNaN(parsedWeight)) {
+      Alert.alert('Check your numbers', 'Weight should be a number, or left blank.');
+      return;
+    }
 
     onSubmit({
       exercise_name: trimmedName,
       sets: parsedSets,
       reps: trimmedReps,
       rest_seconds: parsedRest,
+      weight: parsedWeight,
     });
     onClose();
   }
@@ -59,7 +74,8 @@ export function ExerciseFormModal({ visible, initial, onSubmit, onClose }: Props
     <ModalSheet
       visible={visible}
       title={initial ? 'Edit Exercise' : 'Add Exercise'}
-      onClose={onClose}>
+      onClose={onClose}
+      centered>
       <TextInput
         value={name}
         onChangeText={setName}
@@ -99,6 +115,16 @@ export function ExerciseFormModal({ visible, initial, onSubmit, onClose }: Props
           />
         </Field>
       </View>
+      <Field label="Weight (optional)">
+        <TextInput
+          value={weight}
+          onChangeText={setWeight}
+          keyboardType="decimal-pad"
+          placeholder="e.g. 60 kg"
+          placeholderTextColor={palette.textSubtle}
+          style={styles.input}
+        />
+      </Field>
       <View style={styles.actions}>
         <View style={styles.flex}>
           <PrimaryButton label="Cancel" variant="ghost" onPress={onClose} />
@@ -144,6 +170,7 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     gap: 10,
+    marginTop: 55,
   },
   flex: {
     flex: 1,

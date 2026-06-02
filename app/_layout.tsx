@@ -36,10 +36,19 @@ async function migrateDb(db: SQLiteDatabase) {
       sets INTEGER NOT NULL,
       reps TEXT NOT NULL,
       rest_seconds INTEGER NOT NULL,
+      weight REAL,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (training_day_id) REFERENCES training_days(id) ON DELETE CASCADE
     );
   `);
+
+  // Add the optional weight column to databases created before it existed.
+  const columns = await db.getAllAsync<{ name: string }>(
+    'PRAGMA table_info(exercise_prescriptions)'
+  );
+  if (!columns.some((column) => column.name === 'weight')) {
+    await db.execAsync('ALTER TABLE exercise_prescriptions ADD COLUMN weight REAL;');
+  }
 }
 
 export default function RootLayout() {

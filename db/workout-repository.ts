@@ -28,6 +28,20 @@ export function deleteSplitProgram(db: SQLiteDatabase, id: number) {
   return db.runAsync('DELETE FROM split_programs WHERE id = ?', [id]);
 }
 
+export function getAllTrainingDays(db: SQLiteDatabase) {
+  return db.getAllAsync<TrainingDay>(
+    'SELECT id, split_program_id, name FROM training_days ORDER BY created_at ASC'
+  );
+}
+
+export function getAllExercises(db: SQLiteDatabase) {
+  return db.getAllAsync<ExercisePrescription>(
+    `SELECT id, training_day_id, exercise_name, sets, reps, rest_seconds, weight
+     FROM exercise_prescriptions
+     ORDER BY created_at ASC`
+  );
+}
+
 export function getTrainingDays(db: SQLiteDatabase, splitProgramId: number) {
   return db.getAllAsync<TrainingDay>(
     'SELECT id, split_program_id, name FROM training_days WHERE split_program_id = ? ORDER BY created_at ASC',
@@ -57,7 +71,7 @@ export function deleteTrainingDay(db: SQLiteDatabase, id: number) {
 
 export function getExercisePrescriptions(db: SQLiteDatabase, trainingDayId: number) {
   return db.getAllAsync<ExercisePrescription>(
-    `SELECT id, training_day_id, exercise_name, sets, reps, rest_seconds
+    `SELECT id, training_day_id, exercise_name, sets, reps, rest_seconds, weight
      FROM exercise_prescriptions
      WHERE training_day_id = ?
      ORDER BY created_at ASC`,
@@ -72,9 +86,9 @@ export function createExercisePrescription(
 ) {
   return db.runAsync(
     `INSERT INTO exercise_prescriptions
-     (training_day_id, exercise_name, sets, reps, rest_seconds)
-     VALUES (?, ?, ?, ?, ?)`,
-    [trainingDayId, input.exercise_name, input.sets, input.reps, input.rest_seconds]
+     (training_day_id, exercise_name, sets, reps, rest_seconds, weight)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [trainingDayId, input.exercise_name, input.sets, input.reps, input.rest_seconds, input.weight]
   );
 }
 
@@ -85,9 +99,9 @@ export function updateExercisePrescription(
 ) {
   return db.runAsync(
     `UPDATE exercise_prescriptions
-     SET exercise_name = ?, sets = ?, reps = ?, rest_seconds = ?
+     SET exercise_name = ?, sets = ?, reps = ?, rest_seconds = ?, weight = ?
      WHERE id = ?`,
-    [input.exercise_name, input.sets, input.reps, input.rest_seconds, id]
+    [input.exercise_name, input.sets, input.reps, input.rest_seconds, input.weight, id]
   );
 }
 

@@ -5,15 +5,15 @@ This context describes how the app names and organizes reusable workout plans.
 ## Language
 
 **Split Program**:
-A reusable workout plan made of one or more **Training Days**. Examples include Push Pull Legs and Upper Lower.
+The root of a reusable workout plan. Everything else — its **Training Days** and **Exercise Prescriptions** — belongs to exactly one Split Program. Examples include Push Pull Legs and Upper Lower.
 _Avoid_: Split, program, routine
 
 **Training Day**:
-A named day inside a **Split Program** that groups one or more **Exercise Prescriptions**. Examples include Push Day, Pull Day, and Legs Day.
+A named day that belongs to a **Split Program** and groups one or more **Exercise Prescriptions**. Examples include Push Day, Pull Day, and Legs Day.
 _Avoid_: Workout, workout name, day
 
 **Exercise Prescription**:
-An exercise entry inside a **Training Day** that defines the intended exercise name, sets, reps, and rest time.
+An exercise entry that belongs to a **Training Day** and, through it, to the same **Split Program**. It defines the intended exercise name, sets, reps, rest time, and optional weight.
 _Avoid_: Exercise, workout item, set
 
 ## Example Dialogue
