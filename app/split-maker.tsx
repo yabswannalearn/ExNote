@@ -1,24 +1,18 @@
 import { useState } from 'react';
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollViewContainer } from 'react-native-reorderable-list';
 
 import { ChipTabs } from '@/components/split-maker/chip-tabs';
 import { ContextHeader } from '@/components/split-maker/context-header';
 import { EmptyState } from '@/components/split-maker/empty-state';
-import { EntityRow } from '@/components/split-maker/entity-row';
 import { ExerciseFormModal } from '@/components/split-maker/exercise-form-modal';
 import { palette } from '@/components/split-maker/palette';
 import { PrimaryButton } from '@/components/split-maker/primary-button';
 import { RenameModal } from '@/components/split-maker/rename-modal';
+import { ReorderableDayChips } from '@/components/split-maker/reorderable-day-chips';
+import { ReorderableExerciseList } from '@/components/split-maker/reorderable-exercise-list';
 import { useSplitMaker } from '@/hooks/use-split-maker';
 import type { ExerciseInput, ExercisePrescription } from '@/types/workout';
 
@@ -88,7 +82,7 @@ export default function SplitMakerScreen() {
     <KeyboardAvoidingView
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView
+      <ScrollViewContainer
         style={styles.flex}
         contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 32 }]}
         keyboardShouldPersistTaps="handled">
@@ -127,10 +121,11 @@ export default function SplitMakerScreen() {
                   )
                 }
               />
-              <ChipTabs
-                items={sm.trainingDays.map((d) => ({ id: d.id, label: d.name }))}
+              <ReorderableDayChips
+                days={sm.trainingDays}
                 selectedId={sm.selectedDayId}
                 onSelect={sm.setSelectedDayId}
+                onReorder={sm.reorderDays}
                 onAdd={() => setPrompt({ kind: 'add-day' })}
                 addLabel="New Day"
               />
@@ -162,28 +157,22 @@ export default function SplitMakerScreen() {
                 {sm.exercises.length === 0 ? (
                   <EmptyState icon="barbell-outline" text="No workouts in this day yet." />
                 ) : (
-                  sm.exercises.map((exercise) => (
-                    <EntityRow
-                      key={exercise.id}
-                      title={exercise.exercise_name}
-                      subtitle={
-                        `${exercise.sets} sets x ${exercise.reps} reps · ${exercise.rest_seconds}s rest` +
-                        (exercise.weight !== null ? ` · ${exercise.weight} kg` : '')
-                      }
-                      onEdit={() => openEditExercise(exercise)}
-                      onDelete={() =>
-                        confirmDelete(`Delete "${exercise.exercise_name}"?`, () =>
-                          sm.removeExercise(exercise.id)
-                        )
-                      }
-                    />
-                  ))
+                  <ReorderableExerciseList
+                    exercises={sm.exercises}
+                    onReorder={sm.reorderExercises}
+                    onEdit={openEditExercise}
+                    onDelete={(exercise) =>
+                      confirmDelete(`Delete "${exercise.exercise_name}"?`, () =>
+                        sm.removeExercise(exercise.id)
+                      )
+                    }
+                  />
                 )}
               </View>
             ) : null}
           </>
         )}
-      </ScrollView>
+      </ScrollViewContainer>
 
       <RenameModal
         visible={prompt !== null}

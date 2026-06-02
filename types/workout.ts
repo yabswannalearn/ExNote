@@ -58,3 +58,33 @@ export type SetEntryInput = {
   reps: string;
   weight: number | null;
 };
+
+export type SessionHistoryItem = {
+  id: number;
+  started_at: string;
+  finished_at: string;
+  training_day_name: string;
+  split_program_name: string;
+  set_count: number;
+};
+
+export type SessionExerciseGroup = {
+  exercise_name: string;
+  sets: SetEntry[];
+};
+
+export type SessionDetail = {
+  id: number;
+  started_at: string;
+  finished_at: string | null;
+  training_day_name: string;
+  split_program_name: string;
+  groups: SessionExerciseGroup[];
+};
+
+export type PersonalRecord = {
+  exercise_name: string;
+  best_weight: number;
+  reps_at_best: string;
+  achieved_at: string;
+};

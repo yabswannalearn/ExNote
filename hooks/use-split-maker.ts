@@ -9,6 +9,19 @@ import type {
   TrainingDay,
 } from '@/types/workout';
 
+// Returns `items` rearranged to match `orderedIds`. Ids not present in the list
+// are ignored; items missing from `orderedIds` are appended in their original
+// order so a stale id list can never drop rows.
+function reorderByIds<T extends { id: number }>(items: T[], orderedIds: number[]): T[] {
+  const byId = new Map(items.map((item) => [item.id, item]));
+  const ordered = orderedIds
+    .map((id) => byId.get(id))
+    .filter((item): item is T => item !== undefined);
+  const orderedSet = new Set(ordered.map((item) => item.id));
+  const leftovers = items.filter((item) => !orderedSet.has(item.id));
+  return [...ordered, ...leftovers];
+}
+
 // Business logic / state orchestration for the Split Maker screen.
 // Holds the selection hierarchy (split -> day -> exercises) and keeps each
 // level loaded in sync with the one above it. UI stays free of DB concerns.
@@ -131,6 +144,18 @@ export function useSplitMaker(initialSplitId?: number) {
     [db, loadTrainingDays]
   );
 
+  const reorderDays = useCallback(
+    async (orderedIds: number[]) => {
+      if (!selectedSplitId) return;
+      // Optimistically apply the new order so dragging feels instant, then
+      // persist and reload to re-sync with the DB.
+      setTrainingDays((current) => reorderByIds(current, orderedIds));
+      await repo.reorderTrainingDays(db, selectedSplitId, orderedIds);
+      await loadTrainingDays();
+    },
+    [db, loadTrainingDays, selectedSplitId]
+  );
+
   const addExercise = useCallback(
     async (input: ExerciseInput) => {
       if (!selectedDayId) return;
@@ -156,6 +181,16 @@ export function useSplitMaker(initialSplitId?: number) {
     [db, loadExercises]
   );
 
+  const reorderExercises = useCallback(
+    async (orderedIds: number[]) => {
+      if (!selectedDayId) return;
+      setExercises((current) => reorderByIds(current, orderedIds));
+      await repo.reorderExercises(db, selectedDayId, orderedIds);
+      await loadExercises();
+    },
+    [db, loadExercises, selectedDayId]
+  );
+
   return {
     splitPrograms,
     trainingDays,
@@ -172,8 +207,10 @@ export function useSplitMaker(initialSplitId?: number) {
     addDay,
     renameDay,
     removeDay,
+    reorderDays,
     addExercise,
     updateExercise,
     removeExercise,
+    reorderExercises,
   };
 }

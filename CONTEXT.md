@@ -24,6 +24,10 @@ _Avoid_: workout, log, session record
 One actual set inside a **Logged Session** — actual reps, actual weight, and a done flag. Linked to the **Exercise Prescription** it was performed against.
 _Avoid_: set, rep, entry
 
+**Personal Record (PR)**:
+The best performance recorded for an exercise name across all finished **Logged Sessions** — the heaviest **Set Entry** weight, plus the estimated 1-rep-max derived from it. Keyed by exercise name, so the same exercise shares one PR history across every **Split Program** and **Training Day**.
+_Avoid_: max, best, record
+
 ## Example Dialogue
 
 Developer: "Does Push Pull Legs have three Training Days?"

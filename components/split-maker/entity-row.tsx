@@ -11,9 +11,20 @@ type Props = {
   onSelect?: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  // When provided, a leading drag handle is shown; long-pressing it begins a
+  // reorder drag. Wired to react-native-reorderable-list's drag trigger.
+  onDragStart?: () => void;
 };
 
-export function EntityRow({ title, subtitle, selected = false, onSelect, onEdit, onDelete }: Props) {
+export function EntityRow({
+  title,
+  subtitle,
+  selected = false,
+  onSelect,
+  onEdit,
+  onDelete,
+  onDragStart,
+}: Props) {
   return (
     <Pressable
       onPress={onSelect}
@@ -23,6 +34,12 @@ export function EntityRow({ title, subtitle, selected = false, onSelect, onEdit,
         selected && styles.selectedRow,
         pressed && onSelect && styles.pressed,
       ]}>
+      {onDragStart ? (
+        <Pressable onLongPress={onDragStart} delayLongPress={150} hitSlop={8} style={styles.iconButton}>
+          <Ionicons name="reorder-three-outline" size={22} color={palette.textSubtle} />
+        </Pressable>
+      ) : null}
+
       {onSelect ? (
         <Ionicons
           name={selected ? 'radio-button-on' : 'radio-button-off'}
